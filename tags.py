@@ -25,6 +25,8 @@ TAGS = {
 def build_tag(url, extension, tagType):
     if extension not in TAGS:
         extension = ".html"
+    if tagType not in TAGS[extension]:
+        return ''
     return TAGS[extension][tagType] % url
 
 class CdnjsTagBuilder(sublime_plugin.TextCommand):
