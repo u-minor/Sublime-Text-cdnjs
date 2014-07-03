@@ -26,6 +26,26 @@ def get_package_list(path):
 
 
 def set_package_list(path, packageList):
-    packageList = json.loads(packageList)
     with open(path, 'w') as f:
-        f.write(json.dumps(packageList))
+        f.write(packageList)
+
+
+def optimize_cache(data):
+    data = json.loads(data)
+
+    for p in data['packages']:
+        # delete unused keys
+        for key in list(p):
+            if key not in ['assets', 'name', 'description']:
+                del p[key]
+
+        # simplify assets data structure
+        assets = {}
+        for i, a in enumerate(p['assets']):
+            files = []
+            for f in a['files']:
+                files.append(f['name'])
+            assets[a['version']] = files
+        p['assets'] = assets
+
+    return json.dumps(data)

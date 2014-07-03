@@ -11,6 +11,7 @@ from .cache import get_cache_path
 from .cache import get_package_list
 from .cache import set_package_list
 from .cache import time_has_passed
+from .cache import optimize_cache
 
 
 class CdnjsApiCall(threading.Thread):
@@ -44,6 +45,7 @@ class CdnjsApiCall(threading.Thread):
     def get_result_from_cdn(self):
         result = get(self.PACKAGES_URL, self.proxies, self.timeout)
         if result:
+            result = optimize_cache(result)
             set_package_list(self.cacheFilePath, result)
         return result
 

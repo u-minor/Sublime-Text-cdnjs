@@ -33,7 +33,7 @@ class CdnjsTagBuilder(sublime_plugin.TextCommand):
 
     def run(self, edit, **args):
         self.package = args.get("package", {})
-        self.asset = args.get("asset", {})
+        self.version = args.get("version", '')
         self.file = args.get("file", 'test.js')
         self.onlyURL = args.get("onlyURL", False)
         self.wholeFile = args.get("wholeFile", False)
@@ -42,7 +42,7 @@ class CdnjsTagBuilder(sublime_plugin.TextCommand):
     def get_path(self):
         path = self.PATH_FORMAT % {
             "name": self.package.get("name"),
-            "version": self.asset.get("version"),
+            "version": self.version,
             "filename": self.file
         }
 

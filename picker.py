@@ -35,9 +35,7 @@ class CdnjsVersionPickerCommand(sublime_plugin.TextCommand):
         sublime.set_timeout(self.show_quickpanel, 10)
 
     def get_list(self):
-        assets = self.package["assets"]
-        versions = [version["version"] for version in assets]
-        return versions
+        return sorted(self.package['assets'], reverse=True)
 
     def show_quickpanel(self):
         self.view.window().show_quick_panel(self.get_list(), self.callback)
@@ -46,26 +44,28 @@ class CdnjsVersionPickerCommand(sublime_plugin.TextCommand):
         if index == -1:
             return
 
-        asset = self.package["assets"][index]
+        version = sorted(self.package["assets"], reverse=True)[index]
+        files = self.package["assets"][version]
         self.view.run_command('cdnjs_file_picker', {
             "package": self.package,
             "onlyURL": self.onlyURL,
             "wholeFile": self.wholeFile,
-            "asset": asset
+            "version": version,
+            "files": files
         })
 
 
 class CdnjsFilePickerCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
         self.package = args.get("package", {})
-        self.asset = args.get("asset", {})
+        self.version = args.get("version", '')
+        self.files = args.get("files", [])
         self.onlyURL = args.get("onlyURL", False)
         self.wholeFile = args.get("wholeFile", False)
         sublime.set_timeout(self.show_quickpanel, 10)
 
     def get_list(self):
-        files = self.asset.get("files", [])
-        return [f.get("name", '') for f in files]
+        return sorted(self.files)
 
     def show_quickpanel(self):
         self.view.window().show_quick_panel(self.get_list(), self.callback)
@@ -74,11 +74,10 @@ class CdnjsFilePickerCommand(sublime_plugin.TextCommand):
         if index == -1:
             return
 
-        fileName = self.asset["files"][index]["name"]
         self.view.run_command('cdnjs_tag_builder', {
             "package": self.package,
-            "asset": self.asset,
-            "file": fileName,
+            "version": self.version,
+            "file": self.files[index],
             "onlyURL": self.onlyURL,
             "wholeFile": self.wholeFile
         })
