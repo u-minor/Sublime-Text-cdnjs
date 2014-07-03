@@ -1,10 +1,11 @@
+import sublime
+
 import json
 import os
 import time
 
 def get_cache_path():
-    home = os.path.expanduser("~")
-    return home + '/package_list.cdncache'
+    return sublime.packages_path() + '/User/cdnjs.packages.cache'
 
 
 def time_has_passed(last_time, time_now):
