@@ -14,19 +14,18 @@ def time_has_passed(last_time, time_now):
         return time_is_blank
     time_difference = int(time.time()) - int(last_time)
     time_has_passed = time_difference > int(time_now)
-    print(time_difference)
-    print(time_has_passed)
-    
+
     return time_has_passed
 
 
 def get_package_list(path):
-    packageList = {}
+    packageList = ''
     with open(path, 'r') as f:
-        packageList = json.loads(f.read())
+        packageList = f.read()
     return packageList
 
 
 def set_package_list(path, packageList):
+    packageList = json.loads(packageList)
     with open(path, 'w') as f:
         f.write(json.dumps(packageList))

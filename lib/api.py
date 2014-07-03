@@ -44,7 +44,7 @@ class CdnjsApiCall(threading.Thread):
     def get_result_from_cdn(self):
         result = get(self.PACKAGES_URL, self.proxies, self.timeout)
         if result:
-            self.set_packagelist_cache(result)
+            set_package_list(self.cacheFilePath, result)
         return result
 
     def callback(self):
@@ -59,28 +59,18 @@ class CdnjsApiCall(threading.Thread):
             return None
 
         try:
-            # try to open the cached file
-            packageList = get_package_list(self.cacheFilePath)
-            last_save = packageList.get('last_save')
             # check if the last save is older than the cacheTime
-            if time_has_passed(last_save, self.cacheTime):
+            if time_has_passed(os.stat(self.cacheFilePath).st_mtime, self.cacheTime):
                 # missed cache, clear file
                 os.remove(self.cacheFilePath)
                 return None
             else:
                 # hit cache, return cached data
                 self.cachedResponse = True
-                return json.dumps(packageList)
+                return get_package_list(self.cacheFilePath)
         except IOError as e:
             # there was no file found, no cache is set
             return None
         except Exception as e:
             print('Uncaught exception in cdnjs get cache: {0}'.format(e))
             return None
-
-    def set_packagelist_cache(self, packageListString):
-        # read the package list to set a last_save stamp
-        packageList = json.loads(packageListString)
-        packageList.update({'last_save':int(time.time())})
-
-        set_package_list(self.cacheFilePath, packageList)
